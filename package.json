@@ -1,0 +1,27 @@
+{
+  "name": "about-time",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI-powered scheduling buddy - a personal scheduling assistant with voice commands",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:backend": "yarn workspace @about-time/backend dev",
+    "dev:frontend": "yarn workspace @about-time/frontend dev",
+    "dev": "lerna run dev --parallel",
+    "build": "lerna run build",
+    "build:backend": "yarn workspace @about-time/backend build",
+    "build:frontend": "yarn workspace @about-time/frontend build",
+    "lint": "lerna run lint",
+    "clean": "lerna clean"
+  },
+  "devDependencies": {
+    "lerna": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "yarn": ">=1.22.0"
+  }
+}
+
