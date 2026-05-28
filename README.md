@@ -2,7 +2,7 @@
 
 AI-powered scheduling buddy - A personal scheduling assistant that helps you create weekly and monthly schedules using intelligent AI recommendations.
 
-## 🚀 Features
+## Features
 
 - **AI-Powered Scheduling**: Uses Google Gemini API to generate personalized schedules
 - **Context-Aware**: Understands your preferences, work hours, and recurring commitments
@@ -10,34 +10,33 @@ AI-powered scheduling buddy - A personal scheduling assistant that helps you cre
 - **Export & Share**: Download schedules as PDF or send via email
 - **Flexible Planning**: Generate weekly or monthly schedules with easy refinement
 
-## 🛠 Tech Stack
+## Tech Stack
 
-- **Monorepo**: Yarn Workspaces + Lerna
-- **Frontend**: Next.js 14+, TypeScript, TailwindCSS, shadcn/ui
-- **Backend**: Node.js, Express, TypeScript, Mongoose
+- **Monorepo**: pnpm Workspaces
+- **Frontend**: Next.js 16+, TypeScript, TailwindCSS, shadcn/ui
+- **Backend**: Node.js 24, Express, TypeScript, Mongoose
 - **Database**: MongoDB Atlas (free tier)
 - **AI**: Google Gemini API
 - **Email**: SendGrid (free tier)
 - **PDF**: Puppeteer
 
-## 📦 Project Structure
+## Project Structure
 
 ```
 about-time/
 ├── packages/
-│   ├── backend/     # Express API server
-│   └── frontend/    # Next.js web application
-├── k8s/             # Kubernetes manifests
-├── lerna.json       # Lerna configuration
-└── package.json     # Root package with workspaces
+│   ├── backend/          # Express API server
+│   └── frontend/         # Next.js web application
+├── pnpm-workspace.yaml   # pnpm workspace config
+└── package.json          # Root package with workspaces
 ```
 
-## 🏃‍♂️ Getting Started
+## Getting Started
 
 ### Prerequisites
 
-- Node.js >= 18.0.0
-- Yarn >= 1.22.0
+- Node.js >= 24.0.0
+- pnpm >= 11.x
 - MongoDB Atlas account (free tier)
 - Google Gemini API key
 - SendGrid API key
@@ -52,7 +51,7 @@ cd about-time
 
 2. Install dependencies:
 ```bash
-yarn install
+pnpm install
 ```
 
 3. Set up environment variables (see Environment Variables section)
@@ -60,14 +59,14 @@ yarn install
 4. Run development servers:
 ```bash
 # Run both frontend and backend
-yarn dev
+pnpm dev
 
 # Or run individually
-yarn dev:backend
-yarn dev:frontend
+pnpm dev:backend
+pnpm dev:frontend
 ```
 
-## 🔧 Environment Variables
+## Environment Variables
 
 ### Backend (.env)
 ```env
@@ -78,6 +77,7 @@ SENDGRID_API_KEY=your-sendgrid-api-key
 SENDGRID_FROM_EMAIL=your-email@domain.com
 NODE_ENV=development
 PORT=3001
+FRONTEND_URL=http://localhost:3000
 ```
 
 ### Frontend (.env.local)
@@ -85,28 +85,25 @@ PORT=3001
 NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
-## 📜 Available Scripts
+## Available Scripts
 
-- `yarn dev` - Run both frontend and backend in parallel
-- `yarn dev:backend` - Run backend only
-- `yarn dev:frontend` - Run frontend only
-- `yarn build` - Build all packages
-- `yarn lint` - Lint all packages
-- `yarn clean` - Clean all node_modules
+- `pnpm dev` - Run both frontend and backend in parallel
+- `pnpm dev:backend` - Run backend only
+- `pnpm dev:frontend` - Run frontend only
+- `pnpm build` - Build all packages
+- `pnpm lint` - Lint all packages
+- `pnpm clean` - Clean all node_modules and build artifacts
 
-## 🚢 Deployment
+## Deployment
 
 The project can be deployed using:
 - **Kubernetes**: minikube (local) or Oracle Cloud Free Tier (production)
 - **Alternative**: Railway (backend) + Vercel (frontend)
 
-See the `/k8s` directory for Kubernetes manifests.
-
-## 📝 License
+## License
 
 MIT
 
-## 🤝 Contributing
+## Contributing
 
 This is a personal project, but feel free to fork and adapt for your own use!
-

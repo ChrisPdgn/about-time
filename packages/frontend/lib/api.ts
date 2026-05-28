@@ -8,30 +8,14 @@ class ApiClient {
   constructor() {
     this.client = axios.create({
       baseURL: API_URL,
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
+      withCredentials: true, // send httpOnly cookies on every request
     });
 
-    // Request interceptor to add auth token
-    this.client.interceptors.request.use(
-      (config) => {
-        const token = localStorage.getItem('token');
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-      },
-      (error) => Promise.reject(error)
-    );
-
-    // Response interceptor for error handling
     this.client.interceptors.response.use(
       (response) => response,
       (error: AxiosError) => {
-        if (error.response?.status === 401) {
-          // Token expired or invalid
-          localStorage.removeItem('token');
+        if (error.response?.status === 401 && typeof window !== 'undefined') {
           window.location.href = '/login';
         }
         return Promise.reject(error);
@@ -41,19 +25,22 @@ class ApiClient {
 
   // Auth endpoints
   async register(email: string, password: string, name?: string) {
-    const response = await this.client.post('/api/auth/register', {
-      email,
-      password,
-      name,
-    });
+    const response = await this.client.post('/api/auth/register', { email, password, name });
     return response.data;
   }
 
   async login(email: string, password: string) {
-    const response = await this.client.post('/api/auth/login', {
-      email,
-      password,
-    });
+    const response = await this.client.post('/api/auth/login', { email, password });
+    return response.data;
+  }
+
+  async logout() {
+    const response = await this.client.post('/api/auth/logout');
+    return response.data;
+  }
+
+  async getMe() {
+    const response = await this.client.get('/api/auth/me');
     return response.data;
   }
 
@@ -97,9 +84,7 @@ class ApiClient {
   }
 
   async updateScheduleStatus(id: string, status: 'draft' | 'finalized') {
-    const response = await this.client.patch(`/api/schedules/${id}/status`, {
-      status,
-    });
+    const response = await this.client.patch(`/api/schedules/${id}/status`, { status });
     return response.data;
   }
 
@@ -117,12 +102,9 @@ class ApiClient {
   }
 
   async emailSchedule(id: string, email: string) {
-    const response = await this.client.post(`/api/export/${id}/email`, {
-      email,
-    });
+    const response = await this.client.post(`/api/export/${id}/email`, { email });
     return response.data;
   }
 }
 
 export const api = new ApiClient();
-

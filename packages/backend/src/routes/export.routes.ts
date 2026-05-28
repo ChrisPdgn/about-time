@@ -1,4 +1,4 @@
-import { Router, Response } from 'express';
+import { Router, IRouter, Response } from 'express';
 import { Schedule } from '../models/Schedule.model';
 import { User } from '../models/User.model';
 import { authMiddleware } from '../middleware/auth.middleware';
@@ -6,7 +6,7 @@ import { AuthRequest } from '../types';
 import { ExportService } from '../services/export.service';
 import { EmailService } from '../services/email.service';
 
-const router = Router();
+const router: IRouter = Router();
 const exportService = new ExportService();
 const emailService = new EmailService();
 

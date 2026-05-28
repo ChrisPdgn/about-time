@@ -1,11 +1,11 @@
-import { Router, Response } from 'express';
+import { Router, IRouter, Response } from 'express';
 import { Schedule } from '../models/Schedule.model';
 import { UserContext } from '../models/UserContext.model';
 import { authMiddleware } from '../middleware/auth.middleware';
 import { AuthRequest, GenerateScheduleRequest } from '../types';
 import { GeminiService } from '../services/gemini.service';
 
-const router = Router();
+const router: IRouter = Router();
 const geminiService = new GeminiService();
 
 // All routes require authentication

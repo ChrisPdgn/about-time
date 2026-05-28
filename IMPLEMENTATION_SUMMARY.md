@@ -1,16 +1,18 @@
 # About Time - Implementation Summary
 
-## 🎉 What Has Been Built
+## What Has Been Built
 
-Your complete **About Time** scheduling application is now implemented! Here's everything that's ready:
+Your complete **About Time** scheduling application is now implemented and security hardened. Here's everything that's ready:
 
 ### Backend (Express + TypeScript + MongoDB)
 
-#### ✅ Complete API Endpoints
+#### Complete API Endpoints
 
 **Authentication**
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login with JWT tokens
+- `POST /api/auth/register` - User registration (sets httpOnly session cookie)
+- `POST /api/auth/login` - User login (sets httpOnly session cookie)
+- `POST /api/auth/logout` - Clear session cookie
+- `GET /api/auth/me` - Return current user from active session
 
 **Context Management**
 - `GET /api/context` - Get user context
@@ -28,26 +30,30 @@ Your complete **About Time** scheduling application is now implemented! Here's e
 - `GET /api/export/:id/pdf` - Download schedule as PDF
 - `POST /api/export/:id/email` - Send schedule via email
 
-#### ✅ Database Models (Mongoose)
-- **User**: Email, password (hashed), name, timestamps
+#### Database Models (Mongoose)
+- **User**: Email, password (hashed with bcrypt, min 8 chars), name, timestamps
 - **UserContext**: General preferences, work schedule, recurring activities
 - **Schedule**: Type, date range, time blocks, status, version tracking
 
-#### ✅ Services
+#### Services
 - **GeminiService**: AI integration for intelligent schedule generation
 - **ExportService**: PDF generation with Puppeteer (beautiful HTML templates)
 - **EmailService**: SendGrid integration for email delivery
 
-#### ✅ Security & Middleware
-- JWT authentication middleware
-- Password hashing with bcrypt
-- Rate limiting
-- CORS configuration
-- Helmet for security headers
+#### Security & Middleware
+- httpOnly cookie session management (XSS-safe JWT storage)
+- Zod input validation on all auth routes
+- Auth-specific rate limiting: 5 requests / 15 min per IP (brute-force protection)
+- Global rate limiting: 100 requests / 15 min per IP
+- Request body size limit: 10 KB
+- Password hashing with bcrypt (min 8 characters)
+- Helmet with explicit Content-Security-Policy
+- CORS locked to configured frontend origin with explicit methods/headers
+- cookie-parser for reading session cookies
 
-### Frontend (Next.js 14 + TypeScript + Tailwind + shadcn/ui)
+### Frontend (Next.js 16 + TypeScript + Tailwind + shadcn/ui)
 
-#### ✅ Complete Pages
+#### Complete Pages
 
 **Public Pages**
 - `/` - Landing page with features overview
@@ -61,16 +67,16 @@ Your complete **About Time** scheduling application is now implemented! Here's e
 - `/schedules/generate` - AI schedule generation interface
 - `/schedules/[id]` - Detailed schedule view with export options
 
-#### ✅ Components & Features
+#### Components & Features
 - Beautiful shadcn/ui components (Button, Input, Card, Label, etc.)
-- Auth context with localStorage persistence
-- API client with automatic token injection
+- Auth context using `/api/auth/me` for session restoration on page load
+- Axios client with `withCredentials: true` (cookies sent automatically)
 - Responsive design for mobile and desktop
 - Color-coded schedule categories
 - Export functionality (PDF download, email sending)
 - Schedule regeneration capabilities
 
-## 📦 Project Structure
+## Project Structure
 
 ```
 about-time/
@@ -80,13 +86,13 @@ about-time/
 │   │   │   ├── config/
 │   │   │   │   └── database.ts         # MongoDB connection
 │   │   │   ├── middleware/
-│   │   │   │   └── auth.middleware.ts  # JWT authentication
+│   │   │   │   └── auth.middleware.ts  # Cookie + Bearer JWT auth
 │   │   │   ├── models/
 │   │   │   │   ├── User.model.ts       # User schema
 │   │   │   │   ├── UserContext.model.ts # Context schema
 │   │   │   │   └── Schedule.model.ts   # Schedule schema
 │   │   │   ├── routes/
-│   │   │   │   ├── auth.routes.ts      # Auth endpoints
+│   │   │   │   ├── auth.routes.ts      # Auth endpoints (+ /me, /logout)
 │   │   │   │   ├── context.routes.ts   # Context endpoints
 │   │   │   │   ├── schedule.routes.ts  # Schedule endpoints
 │   │   │   │   └── export.routes.ts    # Export endpoints
@@ -102,8 +108,7 @@ about-time/
 │   │   │   └── index.ts                # Main server file
 │   │   ├── package.json
 │   │   ├── tsconfig.json
-│   │   ├── eslint.config.mjs
-│   │   └── .env.example                # Environment template
+│   │   └── eslint.config.mjs
 │   │
 │   └── frontend/                        # Next.js Application
 │       ├── app/
@@ -126,22 +131,24 @@ about-time/
 │       │       ├── label.tsx
 │       │       └── card.tsx
 │       ├── lib/
-│       │   ├── api.ts                  # API client
+│       │   ├── api.ts                  # API client (withCredentials)
 │       │   ├── auth-context.tsx        # Auth context provider
 │       │   └── utils.ts                # Utility functions
 │       ├── package.json
 │       └── tsconfig.json
 │
+├── pnpm-workspace.yaml                  # pnpm workspace + overrides config
+├── .nvmrc                               # Node version pin (24)
+├── .npmrc                               # engine-strict=true
 ├── package.json                         # Root workspace config
-├── lerna.json                          # Lerna configuration
-├── .gitignore                          # Git ignore rules
-├── README.md                           # Project overview
-├── PROGRESS.md                         # Development progress
-├── GETTING_STARTED.md                  # Setup instructions
+├── .gitignore                           # Git ignore rules
+├── README.md                            # Project overview
+├── PROGRESS.md                          # Development progress
+├── GETTING_STARTED.md                   # Setup instructions
 └── IMPLEMENTATION_SUMMARY.md           # This file
 ```
 
-## 🚀 What You Need to Do Next
+## What You Need to Do Next
 
 ### 1. Set Up External Services (Required)
 
@@ -174,20 +181,23 @@ SENDGRID_API_KEY=your-sendgrid-api-key
 SENDGRID_FROM_EMAIL=your-verified-email@domain.com
 NODE_ENV=development
 PORT=3001
+FRONTEND_URL=http://localhost:3000
+```
+
+Create `packages/frontend/.env.local`:
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
 ### 3. Run the Application
 
 ```bash
 # From project root
-cd /Users/christinapapadogianni/Learning/schedule-app
-
-# Run both backend and frontend
-yarn dev
+pnpm dev
 
 # Or separately:
-# yarn dev:backend  (Terminal 1)
-# yarn dev:frontend (Terminal 2)
+# pnpm dev:backend  (Terminal 1)
+# pnpm dev:frontend (Terminal 2)
 ```
 
 ### 4. Access and Test
@@ -196,44 +206,44 @@ yarn dev
 - Backend: http://localhost:3001/health
 
 **Test Flow:**
-1. Register a new account
+1. Register a new account (password must be 8+ characters)
 2. Set your context (work schedule, preferences, goals)
 3. Generate a weekly or monthly schedule
 4. View, download PDF, or email the schedule
 5. Generate multiple versions and compare
 
-## 📊 Technology Stack Summary
+## Technology Stack Summary
 
 | Layer | Technology | Purpose |
 |-------|-----------|---------|
-| **Monorepo** | Yarn Workspaces + Lerna | Package management |
-| **Backend** | Node.js + Express | REST API server |
+| **Monorepo** | pnpm Workspaces | Package management |
+| **Runtime** | Node.js 24 | JavaScript runtime |
+| **Backend** | Express + TypeScript | REST API server |
 | **Database** | MongoDB + Mongoose | Data persistence |
 | **AI** | Google Gemini API | Schedule generation |
-| **Auth** | JWT + bcrypt | Authentication & security |
+| **Auth** | JWT (httpOnly cookies) + bcrypt | Authentication & security |
+| **Validation** | Zod | Input validation |
 | **PDF** | Puppeteer | Schedule export |
 | **Email** | SendGrid | Email delivery |
-| **Frontend** | Next.js 14 (App Router) | Web application |
+| **Frontend** | Next.js 16 (App Router) | Web application |
 | **Styling** | Tailwind CSS | Responsive design |
 | **UI Components** | shadcn/ui | Modern UI library |
 | **Language** | TypeScript | Type safety |
 
-## 🎯 Key Features Implemented
+## Key Features Implemented
 
-1. ✅ **User Authentication**: Secure registration and login with JWT
-2. ✅ **Context Management**: Store user preferences, work schedules, and recurring activities
-3. ✅ **AI Schedule Generation**: Intelligent scheduling using Google Gemini API
-4. ✅ **Schedule Versioning**: Generate multiple versions and compare
-5. ✅ **Beautiful UI**: Modern, responsive design with shadcn/ui
-6. ✅ **PDF Export**: Download professional-looking PDF schedules
-7. ✅ **Email Delivery**: Send schedules via email
-8. ✅ **Category-Based Planning**: Color-coded activities (work, exercise, learning, etc.)
-9. ✅ **Flexible Scheduling**: Weekly or monthly schedules
-10. ✅ **Custom Requirements**: Add specific needs per schedule generation
+1. **User Authentication**: Secure registration and login with httpOnly cookie sessions
+2. **Context Management**: Store user preferences, work schedules, and recurring activities
+3. **AI Schedule Generation**: Intelligent scheduling using Google Gemini API
+4. **Schedule Versioning**: Generate multiple versions and compare
+5. **Beautiful UI**: Modern, responsive design with shadcn/ui
+6. **PDF Export**: Download professional-looking PDF schedules
+7. **Email Delivery**: Send schedules via email
+8. **Category-Based Planning**: Color-coded activities (work, exercise, learning, etc.)
+9. **Flexible Scheduling**: Weekly or monthly schedules
+10. **Custom Requirements**: Add specific needs per schedule generation
 
-## 🔜 Future Enhancements (Not Implemented Yet)
-
-These are ready for you to add when needed:
+## Future Enhancements (Not Implemented Yet)
 
 ### Voice Commands
 - Integrate Web Speech API or Google Speech-to-Text
@@ -257,66 +267,23 @@ These are ready for you to add when needed:
 - Mobile app (React Native)
 - Dark mode
 
-## 📝 Important Notes
+## Security Notes
 
-### Performance Optimizations
-- Backend uses MongoDB indexes for fast queries
-- Frontend uses Next.js automatic code splitting
-- API client includes automatic token management
-- Rate limiting prevents abuse
+- Passwords are hashed with bcrypt (minimum 8 characters)
+- JWT tokens are stored in httpOnly cookies — inaccessible to JavaScript (XSS-safe)
+- Cookies are `sameSite: strict` and `secure: true` in production
+- Auth endpoints are rate-limited to 5 requests per 15 minutes (brute-force protection)
+- All request bodies are capped at 10 KB
+- Helmet enforces Content-Security-Policy, HSTS, and other security headers
+- CORS is locked to the configured frontend origin
+- Zod validates all auth input before any DB call
+- `pnpm audit` reports 0 known vulnerabilities
 
-### Security Considerations
-- Passwords are hashed with bcrypt
-- JWT tokens expire after 7 days
-- CORS is configured for frontend origin
-- Helmet adds security headers
-- Input validation on all endpoints
-
-### Scalability
-- Stateless API design (scales horizontally)
-- MongoDB Atlas handles database scaling
-- Can add caching layer (Redis) if needed
-- Can add message queue (Bull/RabbitMQ) for async tasks
-
-## 🆘 Troubleshooting
+## Troubleshooting
 
 See `GETTING_STARTED.md` for detailed troubleshooting steps for:
 - MongoDB connection issues
 - API key problems
 - Port conflicts
 - Email delivery issues
-
-## 📚 Documentation Files
-
-- `README.md` - Project overview and quick start
-- `GETTING_STARTED.md` - Detailed setup instructions
-- `PROGRESS.md` - Development progress tracking
-- `IMPLEMENTATION_SUMMARY.md` - This comprehensive summary
-
-## 🎓 Learning Kubernetes
-
-Once the application is running, you can:
-1. Install minikube and kubectl
-2. Create Dockerfiles for both services
-3. Build Docker images
-4. Write Kubernetes manifests (Deployment, Service, ConfigMap, Secret)
-5. Deploy to local minikube cluster
-6. Practice scaling, updates, and rollbacks
-
-This project is perfect for Kubernetes practice because:
-- Two microservices (frontend + backend)
-- External dependencies (MongoDB, APIs)
-- Secrets management (API keys)
-- Service-to-service communication
-- Real-world application behavior
-
-## ✨ Congratulations!
-
-You now have a fully functional AI-powered scheduling application! The hardest part (implementation) is done. Now you just need to:
-1. Set up the external services
-2. Configure environment variables
-3. Run and test the application
-4. Practice with Docker and Kubernetes when ready
-
-Happy scheduling! 🎉
-
+- Cookie / session auth issues

@@ -29,8 +29,8 @@ export interface GenerateScheduleRequest {
 export interface GeneralContext {
   strictness: 'flexible' | 'moderate' | 'strict';
   learningGoals: string[];
-  moodPreferences: Record<string, string>;
-  dailyBusyLevels: Record<string, string>;
+  moodPreferences: Map<string, string>;
+  dailyBusyLevels: Map<string, string>;
 }
 
 export interface WorkSchedule {

@@ -1,9 +1,9 @@
-import { Router, Response } from 'express';
+import { Router, IRouter, Response } from 'express';
 import { UserContext } from '../models/UserContext.model';
 import { authMiddleware } from '../middleware/auth.middleware';
 import { AuthRequest } from '../types';
 
-const router = Router();
+const router: IRouter = Router();
 
 // All routes require authentication
 router.use(authMiddleware);

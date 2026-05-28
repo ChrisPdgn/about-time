@@ -8,23 +8,27 @@ export const authMiddleware = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const authHeader = req.headers.authorization;
+    // Prefer httpOnly cookie; fall back to Bearer header for API clients
+    let token: string | undefined = req.cookies?.token;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!token) {
+      const authHeader = req.headers.authorization;
+      if (authHeader?.startsWith('Bearer ')) {
+        token = authHeader.substring(7);
+      }
+    }
+
+    if (!token) {
       res.status(401).json({ error: 'No token provided' });
       return;
     }
-
-    const token = authHeader.substring(7);
 
     if (!process.env.JWT_SECRET) {
       throw new Error('JWT_SECRET is not defined');
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET) as JwtPayload;
-    
     req.userId = decoded.userId;
-    
     next();
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {
@@ -34,4 +38,3 @@ export const authMiddleware = async (
     res.status(500).json({ error: 'Authentication failed' });
   }
 };
-

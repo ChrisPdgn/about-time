@@ -4,19 +4,17 @@ This guide will help you set up and run the About Time application locally.
 
 ## Prerequisites
 
-- Node.js >= 18.0.0
-- Yarn >= 1.22.0
+- Node.js >= 24.0.0 (use [nvm](https://github.com/nvm-sh/nvm): `nvm install 24 && nvm use 24`)
+- pnpm >= 11.x (`npm install -g pnpm`)
 - MongoDB Atlas account (free tier)
 - Google Gemini API key (free tier)
 - SendGrid API key (free tier)
 
 ## Step 1: Install Dependencies
 
-The dependencies are already installed, but if you need to reinstall:
-
 ```bash
-cd /Users/christinapapadogianni/Learning/schedule-app
-yarn install
+cd about-time
+pnpm install
 ```
 
 ## Step 2: Set Up MongoDB Atlas
@@ -48,7 +46,7 @@ yarn install
 
 ### Backend Environment Variables
 
-Create `/Users/christinapapadogianni/Learning/schedule-app/packages/backend/.env`:
+Create `packages/backend/.env`:
 
 ```env
 MONGODB_URI=mongodb+srv://YOUR_USERNAME:YOUR_PASSWORD@YOUR_CLUSTER.mongodb.net/abouttime?retryWrites=true&w=majority
@@ -58,13 +56,14 @@ SENDGRID_API_KEY=your-sendgrid-api-key-here
 SENDGRID_FROM_EMAIL=your-verified-email@domain.com
 NODE_ENV=development
 PORT=3001
+FRONTEND_URL=http://localhost:3000
 ```
 
 Replace the placeholder values with your actual credentials.
 
 ### Frontend Environment Variables
 
-The frontend already has the `.env.local` configured with:
+Create `packages/frontend/.env.local`:
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
@@ -74,8 +73,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 ### Option 1: Run Both Services Together
 
 ```bash
-cd /Users/christinapapadogianni/Learning/schedule-app
-yarn dev
+pnpm dev
 ```
 
 This will start both the backend (port 3001) and frontend (port 3000) in parallel.
@@ -84,14 +82,12 @@ This will start both the backend (port 3001) and frontend (port 3000) in paralle
 
 Terminal 1 - Backend:
 ```bash
-cd /Users/christinapapadogianni/Learning/schedule-app
-yarn dev:backend
+pnpm dev:backend
 ```
 
 Terminal 2 - Frontend:
 ```bash
-cd /Users/christinapapadogianni/Learning/schedule-app
-yarn dev:frontend
+pnpm dev:frontend
 ```
 
 ## Step 7: Access the Application
@@ -135,7 +131,12 @@ Open your browser and navigate to:
 ### Port Already in Use
 If ports 3000 or 3001 are already in use, you can change them:
 - Backend: Change `PORT` in `.env`
-- Frontend: Run with `yarn dev:frontend -- -p 3002`
+- Frontend: Run with `pnpm dev:frontend -- -p 3002`
+
+### Auth / Cookie Issues
+Session authentication uses httpOnly cookies. If you're testing across different origins or with tools like Postman, make sure:
+- The backend `FRONTEND_URL` env var matches your frontend's actual URL
+- Your HTTP client sends credentials (`withCredentials: true` / `--cookie-jar`)
 
 ## Project Structure
 
@@ -144,18 +145,19 @@ about-time/
 ├── packages/
 │   ├── backend/          # Express API
 │   │   ├── src/
-│   │   │   ├── routes/   # API routes
-│   │   │   ├── models/   # Mongoose models
-│   │   │   ├── services/ # Business logic
+│   │   │   ├── routes/     # API routes
+│   │   │   ├── models/     # Mongoose models
+│   │   │   ├── services/   # Business logic
 │   │   │   └── middleware/ # Auth middleware
-│   │   └── .env          # Backend config (create this)
+│   │   └── .env            # Backend config (create this)
 │   └── frontend/         # Next.js app
-│       ├── app/          # App Router pages
-│       ├── components/   # UI components
-│       ├── lib/          # Utilities
-│       └── .env.local    # Frontend config (already exists)
-├── package.json          # Root package
-└── lerna.json           # Lerna config
+│       ├── app/            # App Router pages
+│       ├── components/     # UI components
+│       ├── lib/            # Utilities
+│       └── .env.local      # Frontend config (create this)
+├── pnpm-workspace.yaml   # pnpm workspace config
+└── package.json          # Root package
+
 ```
 
 ## Next Steps
@@ -174,5 +176,3 @@ If you encounter any issues:
 1. Check the terminal logs for error messages
 2. Verify all environment variables are set correctly
 3. Ensure all external services (MongoDB, Gemini, SendGrid) are configured properly
-4. Check the PROGRESS.md file for implementation status
-
