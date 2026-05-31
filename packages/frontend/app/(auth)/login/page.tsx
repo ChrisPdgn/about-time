@@ -4,17 +4,25 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+
+const C = {
+  primary: '#4F46E5',
+  primaryLight: '#EEF2FF',
+  bg: '#FAFAFC',
+  surface: '#FFFFFF',
+  text: '#111827',
+  textSecondary: '#6B7280',
+  border: '#E5E7EB',
+  error: '#EF4444',
+  errorBg: '#FEF2F2',
+};
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const { login } = useAuth();
   const router = useRouter();
 
@@ -22,7 +30,6 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
     setIsLoading(true);
-
     try {
       await login(email, password);
       router.push('/dashboard');
@@ -34,24 +41,39 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Welcome Back</CardTitle>
-          <CardDescription className="text-center">
-            Sign in to About Time to manage your schedule
-          </CardDescription>
-        </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
-            {error && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm">
-                {error}
-              </div>
-            )}
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: C.bg, padding: '1rem' }}>
+      <div style={{ width: '100%', maxWidth: '420px' }}>
+
+        {/* Logo */}
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <Link href="/" style={{ textDecoration: 'none' }}>
+            <div style={{ fontWeight: 800, fontSize: '1.5rem', letterSpacing: '-0.04em', color: C.primary }}>
+              About Time
+            </div>
+          </Link>
+        </div>
+
+        {/* Card */}
+        <div style={{ backgroundColor: C.surface, borderRadius: '16px', border: `1px solid ${C.border}`, boxShadow: '0 4px 24px rgba(0,0,0,0.06)', padding: '2.25rem' }}>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 800, letterSpacing: '-0.03em', color: C.text, marginTop: 0, marginBottom: '0.4rem', textAlign: 'center' }}>
+            Welcome back
+          </h1>
+          <p style={{ color: C.textSecondary, fontSize: '0.9rem', textAlign: 'center', marginTop: 0, marginBottom: '1.75rem' }}>
+            Sign in to manage your schedule
+          </p>
+
+          {error && (
+            <div style={{ backgroundColor: C.errorBg, color: C.error, padding: '0.75rem 1rem', borderRadius: '8px', fontSize: '0.875rem', marginBottom: '1.25rem', border: `1px solid #FECACA` }}>
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div>
+              <label htmlFor="email" style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: C.text, marginBottom: '0.4rem' }}>
+                Email
+              </label>
+              <input
                 id="email"
                 type="email"
                 placeholder="you@example.com"
@@ -59,11 +81,17 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={isLoading}
+                style={{ width: '100%', padding: '0.65rem 0.875rem', borderRadius: '8px', border: `1px solid ${C.border}`, fontSize: '0.9rem', color: C.text, backgroundColor: C.surface, outline: 'none', boxSizing: 'border-box' }}
+                onFocus={(e) => { e.target.style.borderColor = C.primary; e.target.style.boxShadow = `0 0 0 3px ${C.primaryLight}`; }}
+                onBlur={(e) => { e.target.style.borderColor = C.border; e.target.style.boxShadow = 'none'; }}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
+
+            <div>
+              <label htmlFor="password" style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: C.text, marginBottom: '0.4rem' }}>
+                Password
+              </label>
+              <input
                 id="password"
                 type="password"
                 placeholder="••••••••"
@@ -71,23 +99,29 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={isLoading}
+                style={{ width: '100%', padding: '0.65rem 0.875rem', borderRadius: '8px', border: `1px solid ${C.border}`, fontSize: '0.9rem', color: C.text, backgroundColor: C.surface, outline: 'none', boxSizing: 'border-box' }}
+                onFocus={(e) => { e.target.style.borderColor = C.primary; e.target.style.boxShadow = `0 0 0 3px ${C.primaryLight}`; }}
+                onBlur={(e) => { e.target.style.borderColor = C.border; e.target.style.boxShadow = 'none'; }}
               />
             </div>
-          </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Signing in...' : 'Sign In'}
-            </Button>
-            <p className="text-sm text-center text-muted-foreground">
-              Don't have an account?{' '}
-              <Link href="/register" className="text-primary hover:underline font-medium">
-                Sign up
-              </Link>
-            </p>
-          </CardFooter>
-        </form>
-      </Card>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              style={{ width: '100%', padding: '0.75rem', backgroundColor: isLoading ? '#9CA3AF' : C.primary, color: '#fff', border: 'none', borderRadius: '10px', fontSize: '0.95rem', fontWeight: 700, cursor: isLoading ? 'not-allowed' : 'pointer', marginTop: '0.25rem' }}
+            >
+              {isLoading ? 'Signing in…' : 'Sign In'}
+            </button>
+          </form>
+
+          <p style={{ textAlign: 'center', fontSize: '0.875rem', color: C.textSecondary, marginTop: '1.5rem', marginBottom: 0 }}>
+            Don&apos;t have an account?{' '}
+            <Link href="/register" style={{ color: C.primary, fontWeight: 600, textDecoration: 'none' }}>
+              Sign up
+            </Link>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
-
