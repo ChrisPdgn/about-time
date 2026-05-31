@@ -17,7 +17,7 @@ AI-powered scheduling buddy - A personal scheduling assistant that helps you cre
 - **Backend**: Node.js 24, Express, TypeScript, Mongoose
 - **Database**: MongoDB Atlas (free tier)
 - **AI**: Google Gemini API
-- **Email**: SendGrid (free tier)
+- **Email**: Resend
 - **PDF**: Puppeteer
 
 ## Project Structure
@@ -39,7 +39,7 @@ about-time/
 - pnpm >= 11.x
 - MongoDB Atlas account (free tier)
 - Google Gemini API key
-- SendGrid API key
+- Resend API key
 
 ### Installation
 
@@ -73,8 +73,8 @@ pnpm dev:frontend
 MONGODB_URI=mongodb+srv://...
 JWT_SECRET=your-secret-key
 GEMINI_API_KEY=your-gemini-api-key
-SENDGRID_API_KEY=your-sendgrid-api-key
-SENDGRID_FROM_EMAIL=your-email@domain.com
+RESEND_API_KEY=your-resend-api-key
+RESEND_FROM_EMAIL=your-email@domain.com
 NODE_ENV=development
 PORT=3001
 FRONTEND_URL=http://localhost:3000

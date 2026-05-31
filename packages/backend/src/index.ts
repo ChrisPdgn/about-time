@@ -34,11 +34,13 @@ app.use(cors({
   allowedHeaders: ['Content-Type'],
 }));
 
-// Stricter rate limit for auth endpoints (5 req / 15 min per IP)
+// Stricter rate limit for auth endpoints — only counts failed requests, skips OPTIONS
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  max: process.env.NODE_ENV === 'production' ? 10 : 50,
   message: 'Too many auth attempts, please try again later.',
+  skipSuccessfulRequests: true, // TODO: re-evalueate this
+  skip: (req) => req.method === 'OPTIONS',
 });
 
 // Global rate limit for all other routes

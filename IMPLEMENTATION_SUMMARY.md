@@ -38,7 +38,7 @@ Your complete **About Time** scheduling application is now implemented and secur
 #### Services
 - **GeminiService**: AI integration for intelligent schedule generation
 - **ExportService**: PDF generation with Puppeteer (beautiful HTML templates)
-- **EmailService**: SendGrid integration for email delivery
+- **EmailService**: Resend integration for email delivery
 
 #### Security & Middleware
 - httpOnly cookie session management (XSS-safe JWT storage)
@@ -164,11 +164,11 @@ about-time/
 2. Sign in and get a free API key
 3. Free tier: 60 requests/minute, 1500 requests/day
 
-#### SendGrid
-1. Visit https://signup.sendgrid.com/
-2. Create a free account (100 emails/day)
+#### Resend
+1. Visit https://resend.com/
+2. Create a free account (3,000 emails/month)
 3. Get an API key
-4. Verify a sender email address
+4. Verify a sender domain
 
 ### 2. Configure Environment Variables
 
@@ -177,8 +177,8 @@ Create `packages/backend/.env`:
 MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/abouttime?retryWrites=true&w=majority
 JWT_SECRET=your-super-secret-key-change-in-production
 GEMINI_API_KEY=your-gemini-api-key
-SENDGRID_API_KEY=your-sendgrid-api-key
-SENDGRID_FROM_EMAIL=your-verified-email@domain.com
+RESEND_API_KEY=your-resend-api-key
+RESEND_FROM_EMAIL=your-verified-email@domain.com
 NODE_ENV=development
 PORT=3001
 FRONTEND_URL=http://localhost:3000
@@ -224,7 +224,7 @@ pnpm dev
 | **Auth** | JWT (httpOnly cookies) + bcrypt | Authentication & security |
 | **Validation** | Zod | Input validation |
 | **PDF** | Puppeteer | Schedule export |
-| **Email** | SendGrid | Email delivery |
+| **Email** | Resend | Email delivery |
 | **Frontend** | Next.js 16 (App Router) | Web application |
 | **Styling** | Tailwind CSS | Responsive design |
 | **UI Components** | shadcn/ui | Modern UI library |

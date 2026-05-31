@@ -16,7 +16,7 @@ AI-powered scheduling buddy using pnpm Workspaces monorepo
 - Context management API implemented
 - Gemini AI integration completed
 - Schedule generation API implemented
-- Export services (PDF with Puppeteer, Email with SendGrid)
+- Export services (PDF with Puppeteer, Email with Resend)
 - Next.js frontend initialized with TypeScript and Tailwind
 - shadcn/ui components integrated
 - Auth context and pages created (login, register)
@@ -39,7 +39,7 @@ AI-powered scheduling buddy using pnpm Workspaces monorepo
 1. Test the application end-to-end locally
 2. Set up MongoDB Atlas cluster and get connection URI
 3. Get Google Gemini API key
-4. Get SendGrid API key and verify sender email
+4. Get Resend API key and verify sender domain
 5. Configure environment variables
 6. Dockerize both applications
 7. Create Kubernetes manifests
@@ -61,7 +61,7 @@ AI-powered scheduling buddy using pnpm Workspaces monorepo
 - Built authentication system with JWT
 - Integrated Google Gemini API for schedule generation
 - Implemented PDF export with Puppeteer
-- Implemented email sending with SendGrid
+- Implemented email sending with Resend
 - Created Next.js frontend with App Router
 - Added shadcn/ui components
 - Built authentication pages and context

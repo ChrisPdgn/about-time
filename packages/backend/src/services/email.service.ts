@@ -1,18 +1,14 @@
-import sgMail from '@sendgrid/mail';
+import { Resend } from 'resend';
 
-if (process.env.SENDGRID_API_KEY) {
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-}
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 interface SendEmailParams {
   to: string;
   subject: string;
   html: string;
   attachments?: Array<{
-    content: string;
     filename: string;
-    type: string;
-    disposition: string;
+    content: string | Buffer;
   }>;
 }
 
@@ -20,31 +16,30 @@ export class EmailService {
   private fromEmail: string;
 
   constructor() {
-    this.fromEmail = process.env.SENDGRID_FROM_EMAIL || '';
+    this.fromEmail = process.env.RESEND_FROM_EMAIL || '';
     if (!this.fromEmail) {
-      console.warn('SENDGRID_FROM_EMAIL is not defined');
+      console.warn('RESEND_FROM_EMAIL is not defined');
     }
   }
 
   async sendEmail(params: SendEmailParams): Promise<void> {
     try {
-      if (!process.env.SENDGRID_API_KEY) {
-        throw new Error('SENDGRID_API_KEY is not defined');
+      if (!process.env.RESEND_API_KEY) {
+        throw new Error('RESEND_API_KEY is not defined');
       }
 
       if (!this.fromEmail) {
-        throw new Error('SENDGRID_FROM_EMAIL is not defined');
+        throw new Error('RESEND_FROM_EMAIL is not defined');
       }
 
-      const msg = {
-        to: params.to,
+      await resend.emails.send({
         from: this.fromEmail,
+        to: params.to,
         subject: params.subject,
         html: params.html,
-        attachments: params.attachments || []
-      };
+        attachments: params.attachments,
+      });
 
-      await sgMail.send(msg);
       console.log('Email sent successfully to:', params.to);
     } catch (error) {
       console.error('Email sending error:', error);
@@ -69,12 +64,9 @@ export class EmailService {
       subject: `Your ${scheduleName} Schedule`,
       html,
       attachments: [{
-        content: schedulePdf.toString('base64'),
+        content: schedulePdf,
         filename: `${scheduleName}.pdf`,
-        type: 'application/pdf',
-        disposition: 'attachment'
       }]
     });
   }
 }
-

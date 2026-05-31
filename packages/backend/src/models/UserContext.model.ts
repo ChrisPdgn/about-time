@@ -71,9 +71,6 @@ const userContextSchema = new Schema<IUserContext>({
   }
 });
 
-// Index for faster userId lookups
-userContextSchema.index({ userId: 1 });
-
 // Update the updatedAt timestamp on save
 userContextSchema.pre('save', function(next) {
   this.updatedAt = new Date();

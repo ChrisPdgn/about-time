@@ -8,11 +8,12 @@ This guide will help you set up and run the About Time application locally.
 - pnpm >= 11.x (`npm install -g pnpm`)
 - MongoDB Atlas account (free tier)
 - Google Gemini API key (free tier)
-- SendGrid API key (free tier)
+- Resend API key
 
-## Step 1: Install Dependencies
+## Step 1: Clone and Install
 
 ```bash
+git clone <your-repo-url>
 cd about-time
 pnpm install
 ```
@@ -33,14 +34,13 @@ pnpm install
 4. Create a new API key
 5. Copy the key for later use
 
-## Step 4: Get SendGrid API Key
+## Step 4: Get Resend API Key
 
-1. Go to https://signup.sendgrid.com/
+1. Go to https://resend.com/
 2. Create a free account
-3. Verify your email address
-4. Go to Settings > API Keys
-5. Create a new API key with "Mail Send" permissions
-6. Verify a sender email address (Settings > Sender Authentication)
+3. Verify your domain (or use the sandbox `onboarding@resend.dev` for testing)
+4. Go to API Keys and create a new key
+5. Copy the key for later use
 
 ## Step 5: Configure Environment Variables
 
@@ -52,8 +52,8 @@ Create `packages/backend/.env`:
 MONGODB_URI=mongodb+srv://YOUR_USERNAME:YOUR_PASSWORD@YOUR_CLUSTER.mongodb.net/abouttime?retryWrites=true&w=majority
 JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
 GEMINI_API_KEY=your-gemini-api-key-here
-SENDGRID_API_KEY=your-sendgrid-api-key-here
-SENDGRID_FROM_EMAIL=your-verified-email@domain.com
+RESEND_API_KEY=your-resend-api-key-here
+RESEND_FROM_EMAIL=your-verified-email@domain.com
 NODE_ENV=development
 PORT=3001
 FRONTEND_URL=http://localhost:3000
@@ -68,17 +68,29 @@ Create `packages/frontend/.env.local`:
 NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
-## Step 6: Run the Application
+## Step 6: Build the Backend
 
-### Option 1: Run Both Services Together
+Compile the backend TypeScript to JavaScript:
+
+```bash
+pnpm --filter @about-time/backend build
+```
+
+> **Note:** This step is required for production. In development you can skip it — `pnpm dev` uses `tsx` to run TypeScript directly without a build step.
+
+## Step 7: Run the Application
+
+### Development
+
+#### Option 1: Run Both Services Together
 
 ```bash
 pnpm dev
 ```
 
-This will start both the backend (port 3001) and frontend (port 3000) in parallel.
+This will start both the backend (port 3001) and frontend (port 3000) in parallel using hot-reload.
 
-### Option 2: Run Services Separately
+#### Option 2: Run Services Separately
 
 Terminal 1 - Backend:
 ```bash
@@ -90,13 +102,22 @@ Terminal 2 - Frontend:
 pnpm dev:frontend
 ```
 
-## Step 7: Access the Application
+### Production
+
+After building (Step 6):
+
+```bash
+pnpm --filter @about-time/backend start &
+pnpm --filter @about-time/frontend build && pnpm --filter @about-time/frontend start
+```
+
+## Step 8: Access the Application
 
 Open your browser and navigate to:
 - Frontend: http://localhost:3000
 - Backend Health Check: http://localhost:3001/health
 
-## Step 8: Test the Application
+## Step 9: Test the Application
 
 1. **Register a new account** at http://localhost:3000/register
 2. **Set your context** by going to "Set Context" from the dashboard
@@ -123,10 +144,10 @@ Open your browser and navigate to:
 - Ensure your API key is valid
 - Check that you haven't exceeded the free tier limits (60 req/min, 1500 req/day)
 
-### SendGrid Email Not Sending
-- Verify that your sender email is authenticated in SendGrid
-- Check that your API key has "Mail Send" permissions
-- Make sure you're not exceeding the free tier limit (100 emails/day)
+### Resend Email Not Sending
+- Verify that your sender domain is verified in Resend (or use `onboarding@resend.dev` for testing)
+- Check that your API key is valid and has send permissions
+- Make sure you're not exceeding the free tier limit (3,000 emails/month)
 
 ### Port Already in Use
 If ports 3000 or 3001 are already in use, you can change them:
@@ -175,4 +196,4 @@ See `README.md` and `PROGRESS.md` for more details about the project.
 If you encounter any issues:
 1. Check the terminal logs for error messages
 2. Verify all environment variables are set correctly
-3. Ensure all external services (MongoDB, Gemini, SendGrid) are configured properly
+3. Ensure all external services (MongoDB, Gemini, Resend) are configured properly
